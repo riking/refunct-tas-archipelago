@@ -68,7 +68,9 @@ Maybe [this](https://github.com/spinerak/refunct-tas-archipelago/blob/master/AP_
   - Above doesn't work? A wild guess is you could add this to Steam launch arguments: `cmd /V /C "set WGPU_BACKEND=gles&& %command%"`
     
 ## Stay calm and don't panic
-- Feel free to ask in [the discord](http://discord.gg/archipelago) (-> future-game-design -> Refunct). We will probably ask for your operating system and the error messages you got, and how/when it crashes.
+Feel free to ask in [the discord](http://discord.gg/archipelago) (in the Refunct channel, if you have trouble finding it, honestly just search for "Refunct" and it'll probably pop up). 
+
+We will probably ask for your operating system and the error messages you got, and how/when it crashes.
   
 ## Building
 If you want to build the project yourself, follow the steps from the original [refunct-tas](https://github.com/oberien/refunct-tas) project.

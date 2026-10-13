@@ -61,7 +61,7 @@ struct ArchipelagoState {
     og_randomizer_index: int,
 
 
-    block_brawl_alt: bool,
+    block_brawl_mode: int,
     score_block_brawl_reds: int,
     score_block_brawl_blues: int,
     score_block_brawl_greens: int,
@@ -270,7 +270,7 @@ fn fresh_archipelago_state() -> ArchipelagoState {
         og_randomizer_order: List::new(),
 
 
-        block_brawl_alt: false,
+        block_brawl_mode: 0,
         score_block_brawl_reds: 0,
         score_block_brawl_blues: 0,
         score_block_brawl_greens: 0,
@@ -2128,14 +2128,14 @@ fn archipelago_block_brawl_start(){
     Tas::archipelago_ds_get(keys);
 
     let mut i = 0;
-    if !ARCHIPELAGO_STATE.block_brawl_alt {
+    if ARCHIPELAGO_STATE.block_brawl_mode % 2 == 0 {
         while i < 200 {
-            Tas::spawn_platform_rando_location(3000., 3000., 10.);
+            Tas::spawn_platform_rando_location(3000., 3000., 10., ARCHIPELAGO_STATE.block_brawl_mode / 2);
             i += 1;
         }
-    } else {
+    } else if ARCHIPELAGO_STATE.block_brawl_mode % 2 == 1 {
         while i < 200 {
-            Tas::spawn_platform_rando_location_crazy(3000.);
+            Tas::spawn_platform_rando_location_crazy(3000., ARCHIPELAGO_STATE.block_brawl_mode / 2);
             i += 1;
         }
     }

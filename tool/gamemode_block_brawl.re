@@ -190,12 +190,12 @@ fn block_brawl_start(){
     if BLOCK_BRAWL_SETTINGS.brawl_or_blub == "Block Brawl" {
         if !BLOCK_BRAWL_SETTINGS.alt {
             while i < BLOCK_BRAWL_SETTINGS.number_of_platforms {
-                Tas::spawn_platform_rando_location(3000., 3000., 10.);
+                Tas::spawn_platform_rando_location(3000., 3000., 10., 0);
                 i += 1;
             }
         } else {
             while i < BLOCK_BRAWL_SETTINGS.number_of_platforms {
-                Tas::spawn_platform_rando_location_crazy(3000.);
+                Tas::spawn_platform_rando_location_crazy(3000., 0);
                 i += 1;
             }
         }

@@ -2048,7 +2048,7 @@ fn dash(dash_velocity: f32, do_downward_dash: bool) {
 }
 
 #[rebo::function("Tas::spawn_platform_rando_location")]
-fn spawn_platform_rando_location(max_loc: f32, max_hei: f32, max_rot: f32) -> i32 {
+fn spawn_platform_rando_location(max_loc: f32, max_hei: f32, max_rot: f32, rotate_mode: i32) -> i32 {
     let rx = rand::random::<f32>();
     let ry = rand::random::<f32>();
     let rz = rand::random::<f32>();
@@ -2058,11 +2058,23 @@ fn spawn_platform_rando_location(max_loc: f32, max_hei: f32, max_rot: f32) -> i3
         yaw: (rand::random::<f32>() - 0.5) * 2. * max_rot as f32,
         roll: (rand::random::<f32>() - 0.5) * 2. * max_rot as f32,
     };
-    spawn_platform(loc, rot, Size3D { x: 1., y: 1., z: 1. })
+    let siz = Size3D { x: 1., y: 1., z: 1. };
+    let id = spawn_platform(loc, rot, siz);
+    if rotate_mode == 1 {
+        let speed = -15.0 + 30.0 * rand::random::<f32>();
+        set_rotate_platform(id, loc, rot, siz, Rotation { pitch: 0.0, yaw: speed, roll: 0.0 });
+    }
+    if rotate_mode == 2 {
+        let speed1 = -15.0 + 30.0 * rand::random::<f32>();
+        let speed2 = -15.0 + 30.0 * rand::random::<f32>();
+        let speed3 = -15.0 + 30.0 * rand::random::<f32>();
+        set_rotate_platform(id, loc, rot, siz, Rotation { pitch: speed1, yaw: speed2, roll: speed3 });
+    }
+    id
 }
 
 #[rebo::function("Tas::spawn_platform_rando_location_crazy")]
-fn spawn_platform_rando_location_crazy(max_loc: f32) -> i32 {
+fn spawn_platform_rando_location_crazy(max_loc: f32, rotate_mode: i32) -> i32 {
     let rx = rand::random::<f32>();
     let ry = rand::random::<f32>();
     let rz = rand::random::<f32>();
@@ -2074,11 +2086,22 @@ fn spawn_platform_rando_location_crazy(max_loc: f32) -> i32 {
         yaw: rand::random::<f32>() * 360.0,
         roll: rand::random::<f32>() * 360.0,
     };
-    let id = spawn_platform(loc, rot, Size3D { 
+    let siz = Size3D { 
         x: 0.5 + 2.9 * rand::random::<f32>(), 
         y: 0.5 + 2.9 * rand::random::<f32>(), 
         z: 0.5 + 2.9 * rand::random::<f32>() 
-    });
+    };
+    let id = spawn_platform(loc, rot, siz);
+    if rotate_mode == 1 {
+        let speed = -15.0 + 30.0 * rand::random::<f32>();
+        set_rotate_platform(id, loc, rot, siz, Rotation { pitch: 0.0, yaw: speed, roll: 0.0 });
+    }
+    if rotate_mode == 2 {
+        let speed1 = -15.0 + 30.0 * rand::random::<f32>();
+        let speed2 = -15.0 + 30.0 * rand::random::<f32>();
+        let speed3 = -15.0 + 30.0 * rand::random::<f32>();
+        set_rotate_platform(id, loc, rot, siz, Rotation { pitch: speed1, yaw: speed2, roll: speed3 });
+    }
     id
 }
 #[rebo::function("Tas::spawn_platform_rando_location_uw")]
@@ -2157,7 +2180,12 @@ fn spawn_platform_rando_location_5(lx: f32, ly: f32, lz: f32, yaw: f32, _i: f32)
         yaw: yaw - 90.0 + rand::random::<f32>() * 180.0,
         roll: 0.0,
     };
-    spawn_platform(loc, rot, Size3D { x: 10.0, y: 0.2, z: 0.2 });
+    let siz = Size3D { x: 10.0, y: 0.2, z: 0.2 };
+    let _id = spawn_platform(loc, rot, siz);
+    // if rotate_mode == 1 {
+    //     let speed = 5.0 + 15.0 * rand::random::<f32>();
+    //     set_rotate_platform(id, loc, rot, siz, Rotation { pitch: 0.0, yaw: speed, roll: 0.0 });
+    // }
     let hlength = 10.0 * 125.0;
     let endx = rx + hlength * rot.pitch.to_radians().cos() * rot.yaw.to_radians().cos();
     let endy = ry + hlength * rot.pitch.to_radians().cos() * rot.yaw.to_radians().sin();
@@ -2670,7 +2698,18 @@ thread_local! {
         Cell::new(Rotation { pitch: 0.0, yaw: 0.0, roll: 0.0 });
 }
 
-
+fn set_rotate_platform(internal_index: i32, start_location: Location, start_rotation: Rotation, size: Size3D, rotation_delta: Rotation) {
+    set_platform_movement_path(
+        internal_index, 
+        0.0, 
+        vec![vec![start_location.x, start_location.y, start_location.z]], 
+        start_location,
+        start_rotation,
+        size, 
+        rotation_delta, 
+        0
+    );
+}
 
 #[rebo::function("Tas::add_platform_spawner")]
 fn add_platform_spawner(speed: f32, locations: Vec<Vec<f32>>, size: Size3D, rotation: Rotation, rotation_delta: Rotation, end_behavior: u8, interval: f32) {
@@ -2689,7 +2728,7 @@ fn set_platform_movement_path_rebo(internal_index: i32, speed: f32, locations: V
         first_location,  // current location is set to the first point in the path, but it will be overridden on the first tick, so it doesn't really matter what we set it to
         Rotation { pitch: 0.0, yaw: 0.0, roll: 0.0 },
         Size3D { x: 1., y: 1., z: 1. },
-        Rotation { pitch: 0.0, yaw: 0.0, roll: 0.0 }, 
+        Rotation { pitch: 1.0, yaw: 0.0, roll: 0.0 }, 
         end_behavior
     )
 }
@@ -2854,30 +2893,37 @@ fn movement_step_cached(platform: &mut CachedPlatform, delta_seconds: f32) -> i3
         if end_behavior == 1 {
             return 1;
         }
-        return 0;
+        if end_behavior != 0 {
+            return 0;
+        }
     }
 
-    let target = &path[idx];
+    
+    let rot_pitch = current_rot.pitch + rot_delta.pitch * delta_seconds;
+    let rot_yaw = current_rot.yaw + rot_delta.yaw * delta_seconds;
+    let rot_roll = current_rot.roll + rot_delta.roll * delta_seconds;
+
     let (cx, cy, cz) = (
         current_pos.x,
         current_pos.y,
         current_pos.z,
     );
-
+    
+    let mut target = Location { x: cx, y: cy, z: cz };
+    if idx < path.len() {
+        target = path[idx];
+    }
     let dx = target.x - cx;
     let dy = target.y - cy;
     let dz = target.z - cz;
     let dist_sq = dx*dx + dy*dy + dz*dz;
     let stepp = speed * delta_seconds;
 
-    let rot_pitch = current_rot.pitch + rot_delta.pitch * delta_seconds;
-    let rot_yaw = current_rot.yaw + rot_delta.yaw * delta_seconds;
-    let rot_roll = current_rot.roll + rot_delta.roll * delta_seconds;
 
 
-    if dist_sq <= stepp * stepp || dist_sq <= f32::EPSILON {
+    if (dist_sq <= stepp * stepp || dist_sq <= f32::EPSILON) && end_behavior != 0 {
         platform.set_location_and_rotation_cached(target.x, target.y, target.z, rot_pitch, rot_yaw, rot_roll, platform.size.x, platform.size.y, platform.size.z);
-        platform.movement.as_mut().unwrap().current_loc = *target;
+        platform.movement.as_mut().unwrap().current_loc = target;
         platform.movement.as_mut().unwrap().current_rot = Rotation { pitch: rot_pitch, yaw: rot_yaw, roll: rot_roll };
 
         match end_behavior {
@@ -2917,12 +2963,19 @@ fn movement_step_cached(platform: &mut CachedPlatform, delta_seconds: f32) -> i3
         }
     } else {
         let dist = dist_sq.sqrt();
-        let nx = cx + dx / dist * stepp;
-        let ny = cy + dy / dist * stepp;
-        let nz = cz + dz / dist * stepp;
+        let mut nx = cx;
+        let mut ny = cy;
+        let mut nz = cz;
+        if dist > 0. {
+            nx = cx + dx / dist * stepp;
+            ny = cy + dy / dist * stepp;
+            nz = cz + dz / dist * stepp;
+        }
+        log!("Variables: cx: {}, cy: {}, cz: {}, dx: {}, dy: {}, dz: {}, dist_sq: {}, stepp: {}, dist: {}, nx: {}, ny: {}, nz: {}", cx, cy, cz, dx, dy, dz, dist_sq, stepp, dist, nx, ny, nz);
         platform.set_location_and_rotation_cached(nx, ny, nz, rot_pitch, rot_yaw, rot_roll, platform.size.x, platform.size.y, platform.size.z);
         platform.movement.as_mut().unwrap().current_loc = Location { x: nx, y: ny, z: nz };
         platform.movement.as_mut().unwrap().current_rot = Rotation { pitch: rot_pitch, yaw: rot_yaw, roll: rot_roll };
+        log!("Moving platform {} to ({}, {}, {}) with rotation ({}, {}, {})", platform.platform_id, nx, ny, nz, rot_pitch, rot_yaw, rot_roll);
     }
     0
 }

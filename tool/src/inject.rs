@@ -65,7 +65,47 @@ fn pidof() -> u32 {
     let s = String::from_utf8(output.stdout)
         .expect("Output of pidof is not utf8");
 
-    s.trim()
-        .parse()
-        .expect("Could not find or parse pid of Refunct")
+    // this constant needs to be rechecked and possibly updated if there is a new refunct build
+    const KNOWN_SIZE: u64 = 34400;
+
+    let candidates = s.trim()
+        .split("\n")
+        .map(|id| id.trim().parse::<u32>())
+        .filter(|res| res.is_ok())
+        .map(|res| res.unwrap())
+        .filter(|id| {
+            // use powershell magic to determine the memory size of the binary from which the process started
+            // while not impossible this should be relatively unlikely to accidentally match anything else sharing the process name
+            println!("checking if pid {} could be refunct", id);
+            let res = Command::new("powershell")
+                .args(&[
+                    "-NoProfile",
+                    "-Command",
+                    format!(
+                        "Get-Process -Id {} -Module | where-object {{ $_.ModuleName -eq 'Refunct-Win32-Shipping.exe' }} | Select-Object -ExpandProperty Size",
+                        id
+                    ).as_str()
+                ])
+                .output();
+            match res {
+                Err(_) => false,
+                Ok(res_output) => {
+                    match String::from_utf8(res_output.stdout) {
+                        Err(_) => false,
+                        Ok(size_str) => {
+                            match size_str.trim().parse::<u64>() {
+                                Err(_) => false,
+                                Ok(size) => size == KNOWN_SIZE
+                            }
+                        }
+                    }
+                }
+            }
+        })
+        .collect::<Vec<u32>>();
+    if candidates.len() > 1 || candidates.is_empty() {
+        println!("Found {} processes that match", candidates.len());
+        panic!("Could not find or parse pid of Refunct");
+    }
+    candidates.first().unwrap().to_owned()
 }

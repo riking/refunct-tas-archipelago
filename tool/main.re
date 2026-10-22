@@ -17,6 +17,8 @@ include "archipelago_meta.re"
 include "archipelago_ui.re";
 include "gamemode_block_brawl.re";
 include "gamemode_block_brawl_ui.re";
+include "gamemode_memory.re";
+include "gamemode_memory_ui.re";
 include "gamemode_main.re";
 include "movement.re";
 include "misc.re";

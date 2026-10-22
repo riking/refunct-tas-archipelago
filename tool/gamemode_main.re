@@ -26,13 +26,23 @@ fn create_minigames_menu() -> Ui {
             enter_ui(create_block_brawl_menu());
         },
     }));
+    elements.push(UiElement::Button(UiButton {
+        label: Text { text: "Memory" },
+        onclick: fn(label: Text) {
+            MEMORY_STATE = fresh_memory_state();
+            GAMEMODE_STATE.started = true;
+            enter_ui(create_memory_menu());
+        },
+    }));
     if GAMEMODE_STATE.started {
         elements.push(UiElement::Button(UiButton {
             label: Text { text: "Exit Offline Minigames" },
             onclick: fn(label: Text) {
                 BLOCK_BRAWL_STATE = fresh_block_brawl_state();
+                MEMORY_STATE = fresh_memory_state();
                 GAMEMODE_STATE.started = false;
                 remove_component(BLOCK_BRAWL_COMPONENT);
+                remove_component(MEMORY_COMPONENT);
                 leave_ui();
             },
         }));

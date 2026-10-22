@@ -35,6 +35,8 @@ copy tool\archipelago_log.re build\practice-windows > NUL
 copy tool\archipelago_meta.re build\practice-windows > NUL
 copy tool\gamemode_block_brawl.re build\practice-windows > NUL
 copy tool\gamemode_block_brawl_ui.re build\practice-windows > NUL
+copy tool\gamemode_memory.re build\practice-windows > NUL
+copy tool\gamemode_memory_ui.re build\practice-windows > NUL
 copy tool\gamemode_main.re build\practice-windows > NUL
 copy tool\tas.re build\practice-windows > NUL
 copy tool\windshieldwipers.re build\practice-windows > NUL
